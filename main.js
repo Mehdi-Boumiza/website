@@ -23,19 +23,24 @@ function initThemeToggle() {
 // ==========================================================================
 // Three.js 3D Models Animation
 // ==========================================================================
-function initThreeJS() {
-    const container = document.getElementById('three-container');
+// Helper function to initialize Three.js for a section
+function initThreeJSForSection(containerId, modelPath, options = {}) {
+    const container = document.getElementById(containerId);
     if (!container) return;
-    
+
     // Scene setup
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ 
+    const camera = new THREE.PerspectiveCamera(
+        75,
+        container.clientWidth / container.clientHeight,
+        0.1,
+        1000
+    );
+    const renderer = new THREE.WebGLRenderer({
         alpha: true,
-        antialias: true 
+        antialias: true
     });
-    
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setClearColor(0x000000, 0);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -44,100 +49,39 @@ function initThreeJS() {
     // Lighting setup
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
-    
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
     directionalLight.position.set(10, 10, 5);
     directionalLight.castShadow = true;
     scene.add(directionalLight);
-    
     const pointLight = new THREE.PointLight(0x4f46e5, 0.5, 100);
     pointLight.position.set(-10, -10, -5);
     scene.add(pointLight);
 
-    // Model containers for animation
-    const models = {
-        brain: null,
-        shapes: [],
-        python: null
-    };
-
-    // GLTF Loader
+    // Model(s) for animation
+    let model = null;
+    let models = [];
     const loader = new THREE.GLTFLoader();
 
-    // ==========================================================================
-    // Load brain.glb (Hero section) - REPLACE PATH HERE
-    // ==========================================================================
-    loader.load('/Users/mehdiboumiza/website/models/central_brain_of_mankind_cml.glb', 
-        (gltf) => {
-            models.brain = gltf.scene;
-            models.brain.scale.set(1.5, 1.5, 1.5);
-            models.brain.position.set(2, 1, -2);
-            
-            // Enable shadows
-            models.brain.traverse((child) => {
-                if (child.isMesh) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                }
-            });
-            
-            scene.add(models.brain);
-            console.log('✅ Brain model loaded');
-        },
-        (progress) => {
-            console.log('Loading brain model...', (progress.loaded / progress.total * 100) + '%');
-        },
-        (error) => {
-            console.warn('⚠️ Could not load brain.glb - using fallback geometry');
-            // Fallback: Create a brain-like sphere with wireframe
+    // Utility for fallback geometry, per model type
+    function addFallback() {
+        // Fallback for brain.glb
+        if (modelPath.includes('brain')) {
             const brainGeometry = new THREE.SphereGeometry(1, 16, 16);
-            const brainMaterial = new THREE.MeshLambertMaterial({ 
+            const brainMaterial = new THREE.MeshLambertMaterial({
                 color: 0x8b5cf6,
                 wireframe: true,
                 transparent: true,
                 opacity: 0.7
             });
-            models.brain = new THREE.Mesh(brainGeometry, brainMaterial);
-            models.brain.position.set(2, 1, -2);
-            models.brain.scale.set(1.5, 1.5, 1.5);
-            scene.add(models.brain);
-        }
-    );
-
-    // ==========================================================================
-    // Load shapes.glb (Projects section) - REPLACE PATH HERE  
-    // ==========================================================================
-    loader.load('/Users/mehdiboumiza/website/models/paradox_abstract_art_of_python.glb',
-        (gltf) => {
-            // Create multiple instances of shapes
-            for (let i = 0; i < 5; i++) {
-                const shape = gltf.scene.clone();
-                shape.scale.set(0.3, 0.3, 0.3);
-                shape.position.set(
-                    (Math.random() - 0.5) * 15,
-                    (Math.random() - 0.5) * 10,
-                    (Math.random() - 0.5) * 10
-                );
-                
-                // Enable shadows
-                shape.traverse((child) => {
-                    if (child.isMesh) {
-                        child.castShadow = true;
-                        child.receiveShadow = true;
-                    }
-                });
-                
-                models.shapes.push(shape);
-                scene.add(shape);
+            model = new THREE.Mesh(brainGeometry, brainMaterial);
+            model.scale.set(options.scale || 1, options.scale || 1, options.scale || 1);
+            if (options.position) {
+                model.position.set(options.position.x, options.position.y, options.position.z);
             }
-            console.log('✅ Shape models loaded');
-        },
-        (progress) => {
-            console.log('Loading shapes model...', (progress.loaded / progress.total * 100) + '%');
-        },
-        (error) => {
-            console.warn('⚠️ Could not load shapes.glb - using fallback geometry');
-            // Fallback: Create abstract geometric shapes
+            scene.add(model);
+        }
+        // Fallback for shapes.glb
+        else if (modelPath.includes('shapes')) {
             const geometries = [
                 new THREE.BoxGeometry(0.5, 0.5, 0.5),
                 new THREE.SphereGeometry(0.3, 8, 8),
@@ -145,120 +89,144 @@ function initThreeJS() {
                 new THREE.TetrahedronGeometry(0.4),
                 new THREE.OctahedronGeometry(0.3)
             ];
-            
             for (let i = 0; i < 5; i++) {
                 const geometry = geometries[i % geometries.length];
-                const material = new THREE.MeshLambertMaterial({ 
+                const material = new THREE.MeshLambertMaterial({
                     color: Math.random() * 0xffffff,
                     transparent: true,
                     opacity: 0.8
                 });
                 const shape = new THREE.Mesh(geometry, material);
-                shape.position.set(
-                    (Math.random() - 0.5) * 15,
-                    (Math.random() - 0.5) * 10,
-                    (Math.random() - 0.5) * 10
-                );
-                models.shapes.push(shape);
+                // Randomize position if requested
+                if (options.randomize) {
+                    shape.position.set(
+                        (Math.random() - 0.5) * 15,
+                        (Math.random() - 0.5) * 10,
+                        (Math.random() - 0.5) * 10
+                    );
+                } else if (options.position) {
+                    shape.position.set(options.position.x, options.position.y, options.position.z);
+                }
+                shape.scale.set(options.scale || 1, options.scale || 1, options.scale || 1);
+                models.push(shape);
                 scene.add(shape);
             }
         }
-    );
-
-    // ==========================================================================
-    // Load python.glb (Skills section) - REPLACE PATH HERE
-    // ==========================================================================
-    loader.load('/Users/mehdiboumiza/website/models/python.glb',
-        (gltf) => {
-            models.python = gltf.scene;
-            models.python.scale.set(0.8, 0.8, 0.8);
-            models.python.position.set(-3, -2, 0);
-            
-            // Enable shadows
-            models.python.traverse((child) => {
-                if (child.isMesh) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                }
-            });
-            
-            scene.add(models.python);
-            console.log('✅ Python model loaded');
-        },
-        (progress) => {
-            console.log('Loading python model...', (progress.loaded / progress.total * 100) + '%');
-        },
-        (error) => {
-            console.warn('⚠️ Could not load python.glb - using fallback geometry');
-            // Fallback: Create a Python logo-like shape
+        // Fallback for python.glb
+        else if (modelPath.includes('python')) {
             const pythonGeometry = new THREE.TorusGeometry(0.5, 0.2, 8, 16);
-            const pythonMaterial = new THREE.MeshLambertMaterial({ 
-                color: 0x3776ab, // Python blue
+            const pythonMaterial = new THREE.MeshLambertMaterial({
+                color: 0x3776ab,
                 transparent: true,
                 opacity: 0.9
             });
-            models.python = new THREE.Mesh(pythonGeometry, pythonMaterial);
-            models.python.position.set(-3, -2, 0);
-            models.python.scale.set(0.8, 0.8, 0.8);
-            scene.add(models.python);
+            model = new THREE.Mesh(pythonGeometry, pythonMaterial);
+            model.scale.set(options.scale || 1, options.scale || 1, options.scale || 1);
+            if (options.position) {
+                model.position.set(options.position.x, options.position.y, options.position.z);
+            }
+            scene.add(model);
+        }
+    }
+
+    // Load model(s)
+    loader.load(
+        modelPath,
+        (gltf) => {
+            // Special handling for shapes.glb (multiple shapes)
+            if (modelPath.includes('shapes')) {
+                for (let i = 0; i < 5; i++) {
+                    const shape = gltf.scene.clone();
+                    shape.scale.set(options.scale || 1, options.scale || 1, options.scale || 1);
+                    if (options.randomize) {
+                        shape.position.set(
+                            (Math.random() - 0.5) * 15,
+                            (Math.random() - 0.5) * 10,
+                            (Math.random() - 0.5) * 10
+                        );
+                    } else if (options.position) {
+                        shape.position.set(options.position.x, options.position.y, options.position.z);
+                    }
+                    shape.traverse((child) => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+                    models.push(shape);
+                    scene.add(shape);
+                }
+            } else {
+                model = gltf.scene;
+                model.scale.set(options.scale || 1, options.scale || 1, options.scale || 1);
+                if (options.position) {
+                    model.position.set(options.position.x, options.position.y, options.position.z);
+                }
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+                scene.add(model);
+            }
+        },
+        undefined,
+        (error) => {
+            console.warn(`⚠️ Could not load ${modelPath} - using fallback geometry`);
+            addFallback();
         }
     );
 
     // Camera position
-    camera.position.set(0, 0, 10);
+    camera.position.set(0, 1, 5);
 
     // Animation loop
     function animate() {
         requestAnimationFrame(animate);
-        
-        // Animate brain model (Hero section)
-        if (models.brain) {
-            models.brain.rotation.y += 0.005;
-            models.brain.rotation.x += 0.002;
-            // Subtle floating animation
-            models.brain.position.y = 1 + Math.sin(Date.now() * 0.001) * 0.3;
+        // Animate brain.glb
+        if (modelPath.includes('brain') && model) {
+            model.rotation.y += 0.005;
+            model.rotation.x += 0.002;
+            model.position.y = (options.position ? options.position.y : 0) + Math.sin(Date.now() * 0.001) * 0.3;
         }
-        
-        // Animate floating shapes (Projects section)
-        models.shapes.forEach((shape, index) => {
-            if (shape) {
+        // Animate shapes.glb
+        if (modelPath.includes('shapes') && models.length > 0) {
+            models.forEach((shape, index) => {
                 shape.rotation.y += 0.01 + (index * 0.002);
                 shape.rotation.x += 0.008;
-                // Individual floating patterns
                 shape.position.y += Math.sin(Date.now() * 0.001 + index) * 0.002;
-            }
-        });
-        
-        // Animate python model (Skills section)
-        if (models.python) {
-            models.python.rotation.y += 0.015;
-            models.python.rotation.z += 0.005;
-            // Gentle bobbing animation
-            models.python.position.y = -2 + Math.sin(Date.now() * 0.0015) * 0.2;
+            });
         }
-        
+        // Animate python.glb
+        if (modelPath.includes('python') && model) {
+            model.rotation.y += 0.015;
+            model.rotation.z += 0.005;
+            model.position.y = (options.position ? options.position.y : 0) + Math.sin(Date.now() * 0.0015) * 0.2;
+        }
         renderer.render(scene, camera);
     }
-    
     animate();
-    
-    // Handle window resize
+
+    // Handle resize for this section's renderer
     function handleResize() {
-        camera.aspect = window.innerWidth / window.innerHeight;
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        camera.aspect = w / h;
         camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(w, h);
     }
-    
     window.addEventListener('resize', handleResize);
-    
-    // Cleanup function (optional)
-    window.cleanupThreeJS = function() {
-        if (container.contains(renderer.domElement)) {
-            container.removeChild(renderer.domElement);
-        }
-        renderer.dispose();
-        scene.clear();
-    };
+}
+
+// Initialize Three.js for each section
+function initThreeJS() {
+    // Hero section: brain.glb
+    initThreeJSForSection('three-hero', 'assets/models/brain.glb', { scale: 2, position: {x:0, y:-0.5, z:0} });
+    // Projects section: shapes.glb
+    initThreeJSForSection('three-projects', 'assets/models/shapes.glb', { scale: 0.5, randomize: true });
+    // Skills section: python.glb
+    initThreeJSForSection('three-skills', 'assets/models/python.glb', { scale: 1.2, position: {x:0, y:0, z:0} });
 }
 
 // ==========================================================================
