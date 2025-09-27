@@ -27,7 +27,8 @@ class Laptop3DViewer {
             0.1,
             1000
         );
-        this.camera.position.set(5, 3, 5);
+        // Position camera in front of the laptop screen
+        this.camera.position.set(0.05, 1.54, 1.08); 
 
         // Renderer setup
         this.renderer = new THREE.WebGLRenderer({ 
@@ -44,19 +45,33 @@ class Laptop3DViewer {
         
         this.container.appendChild(this.renderer.domElement);
 
+        // Add camera coordinates overlay
+        this.coordDiv = document.createElement('div');
+        this.coordDiv.style.position = 'absolute';
+        this.coordDiv.style.top = '10px';
+        this.coordDiv.style.left = '10px';
+        this.coordDiv.style.color = 'white';
+        this.coordDiv.style.fontFamily = 'monospace';
+        this.coordDiv.style.zIndex = '1000';
+        this.container.appendChild(this.coordDiv);
+
         // Lighting setup
         this.setupLighting();
 
-        // Controls setup
+        // OrbitControls setup
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.05;
         this.controls.screenSpacePanning = false;
-        this.controls.minDistance = 2;
-        this.controls.maxDistance = 20;
+        this.controls.minDistance = 0.5;
+        this.controls.maxDistance = 10;
         this.controls.maxPolarAngle = Math.PI / 2;
-        this.controls.autoRotate = true;
+        this.controls.autoRotate = false;
         this.controls.autoRotateSpeed = 1;
+
+        // Ensure camera looks at the laptop model (assumed centered at origin)
+        this.controls.target.set(0, 0, 0);
+        this.controls.update();
     }
 
     setupLighting() {
@@ -218,7 +233,7 @@ class Laptop3DViewer {
         this.controls.addEventListener('end', () => {
             clearTimeout(inactivityTimer);
             inactivityTimer = setTimeout(() => {
-                this.controls.autoRotate = true;
+                this.controls.autoRotate = false;
             }, 3000); // 3 seconds of inactivity
         });
 
@@ -237,6 +252,9 @@ class Laptop3DViewer {
         
         // Update controls
         this.controls.update();
+        
+        // Update camera coordinates display
+        this.coordDiv.innerText = `Camera position: x=${this.camera.position.x.toFixed(2)}, y=${this.camera.position.y.toFixed(2)}, z=${this.camera.position.z.toFixed(2)}`;
         
         // Render scene
         this.renderer.render(this.scene, this.camera);
