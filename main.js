@@ -1,280 +1,253 @@
-class Laptop3DViewer {
+class InteractiveLaptopPortfolio {
     constructor() {
-        this.scene = null;
+        this.container = document.getElementById('container');
+        this.loadingElement = document.getElementById('loading');
+
         this.camera = null;
-        this.renderer = null;
+        this.webglScene = null;
+        this.css3dScene = null;
+        this.webglRenderer = null;
+        this.css3dRenderer = null;
         this.controls = null;
         this.laptopModel = null;
-        this.container = document.getElementById('canvas-container');
-        this.loadingElement = document.getElementById('loading');
-        
+        this.screenMesh = null;
+        this.cssObject = null;
+
         this.init();
-        this.addTestCube(); // Add test cube first
         this.loadModel();
-        this.animate();
         this.setupEventListeners();
+        this.animate();
     }
 
     init() {
-        // Scene setup
-        this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x1a1a2e);
-
-        // Camera setup
+        // Camera setup: position in front of laptop screen
         this.camera = new THREE.PerspectiveCamera(
-            75,
+            45,
             window.innerWidth / window.innerHeight,
             0.1,
             1000
         );
-        // Position camera in front of the laptop screen
-        this.camera.position.set(0.05, 1.54, 1.08); 
+        this.camera.position.set(0, 1.5, 3);
 
-        // Renderer setup
-        this.renderer = new THREE.WebGLRenderer({ 
-            antialias: true,
-            alpha: true
-        });
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this.renderer.outputEncoding = THREE.sRGBEncoding;
-        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 1.2;
-        
-        this.container.appendChild(this.renderer.domElement);
+        // WebGL scene and renderer
+        this.webglScene = new THREE.Scene();
+        this.webglScene.background = new THREE.Color(0x1a1a2e);
 
-        // Add camera coordinates overlay
-        this.coordDiv = document.createElement('div');
-        this.coordDiv.style.position = 'absolute';
-        this.coordDiv.style.top = '10px';
-        this.coordDiv.style.left = '10px';
-        this.coordDiv.style.color = 'white';
-        this.coordDiv.style.fontFamily = 'monospace';
-        this.coordDiv.style.zIndex = '1000';
-        this.container.appendChild(this.coordDiv);
+        this.webglRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        this.webglRenderer.setSize(window.innerWidth, window.innerHeight);
+        this.webglRenderer.setPixelRatio(window.devicePixelRatio);
+        this.webglRenderer.shadowMap.enabled = true;
+        this.webglRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.webglRenderer.outputEncoding = THREE.sRGBEncoding;
+        this.container.appendChild(this.webglRenderer.domElement);
 
-        // Lighting setup
-        this.setupLighting();
+        // CSS3D scene and renderer
+        this.css3dScene = new THREE.Scene();
 
-        // OrbitControls setup
-        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        this.css3dRenderer = new THREE.CSS3DRenderer();
+        this.css3dRenderer.setSize(window.innerWidth, window.innerHeight);
+        this.css3dRenderer.domElement.style.position = 'absolute';
+        this.css3dRenderer.domElement.style.top = '0';
+        this.css3dRenderer.domElement.style.left = '0';
+        this.container.appendChild(this.css3dRenderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        this.webglScene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 10, 7);
+        directionalLight.castShadow = true;
+        this.webglScene.add(directionalLight);
+
+        // Controls always enabled for free movement
+        this.controls = new THREE.OrbitControls(this.camera, this.webglRenderer.domElement);
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.05;
-        this.controls.screenSpacePanning = false;
-        this.controls.minDistance = 0.5;
+        this.controls.screenSpacePanning = true;
+        this.controls.minDistance = 1;
         this.controls.maxDistance = 10;
-        this.controls.maxPolarAngle = Math.PI / 2;
+        this.controls.maxPolarAngle = Math.PI / 2.1;
         this.controls.autoRotate = false;
-        this.controls.autoRotateSpeed = 1;
-
-        // Ensure camera looks at the laptop model (assumed centered at origin)
-        this.controls.target.set(0, 0, 0);
-        this.controls.update();
-    }
-
-    setupLighting() {
-        // Ambient light
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
-        this.scene.add(ambientLight);
-
-        // Main directional light
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(10, 10, 5);
-        directionalLight.castShadow = true;
-        directionalLight.shadow.mapSize.width = 2048;
-        directionalLight.shadow.mapSize.height = 2048;
-        directionalLight.shadow.camera.near = 0.5;
-        directionalLight.shadow.camera.far = 50;
-        directionalLight.shadow.camera.left = -10;
-        directionalLight.shadow.camera.right = 10;
-        directionalLight.shadow.camera.top = 10;
-        directionalLight.shadow.camera.bottom = -10;
-        this.scene.add(directionalLight);
-
-        // Fill light
-        const fillLight = new THREE.DirectionalLight(0x87ceeb, 0.3);
-        fillLight.position.set(-5, 5, -5);
-        this.scene.add(fillLight);
-
-        // Rim light
-        const rimLight = new THREE.DirectionalLight(0xff6b6b, 0.2);
-        rimLight.position.set(0, 0, -10);
-        this.scene.add(rimLight);
-    }
-
-    addTestCube() {
-        // Add a test cube to verify 3D scene is working
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshPhongMaterial({ 
-            color: 0x00ff00,
-            transparent: true,
-            opacity: 0.5 
-        });
-        this.testCube = new THREE.Mesh(geometry, material);
-        this.testCube.position.set(0, 1, 0);
-        this.testCube.castShadow = true;
-        this.scene.add(this.testCube);
-        console.log('Test cube added - 3D scene is working!');
     }
 
     loadModel() {
         const loader = new THREE.GLTFLoader();
-        
-        // First, let's check if the file exists and add more detailed error handling
-        console.log('Attempting to load model from: assets/models/laptop.glb');
-        
         loader.load(
             'assets/models/laptop.glb',
             (gltf) => {
                 this.laptopModel = gltf.scene;
-                
-                // Enable shadows for all meshes
+
+                // Enable shadows on meshes
                 this.laptopModel.traverse((child) => {
                     if (child.isMesh) {
                         child.castShadow = true;
                         child.receiveShadow = true;
-                        
-                        // Enhance materials
                         if (child.material) {
                             child.material.needsUpdate = true;
                         }
                     }
                 });
 
-                // Scale and position the model
-                this.scaleModel();
-                
+                // Scale and center model
+                this.scaleAndCenterModel();
+
                 // Add model to scene
-                this.scene.add(this.laptopModel);
-                
-                // Remove test cube when model loads
-                if (this.testCube) {
-                    this.scene.remove(this.testCube);
-                }
-                
-                // Hide loading screen
+                this.webglScene.add(this.laptopModel);
+
+                // Find screen mesh
+                this.findScreenMesh();
+
+                // Create and position CSS3D website
+                this.createAndPositionWebsite();
+
+                // Hide loading element
                 this.loadingElement.style.display = 'none';
-                
-                console.log('Laptop model loaded successfully!');
             },
-            (progress) => {
-                const percent = Math.round((progress.loaded / progress.total) * 100);
-                console.log(`Loading progress: ${percent}%`);
-            },
+            undefined,
             (error) => {
-                console.error('Error loading laptop model:', error);
-                console.error('Error details:', {
-                    message: error.message,
-                    type: error.type,
-                    target: error.target?.src || 'Unknown'
-                });
-                
-                // Check if it's a 404 error (file not found)
-                if (error.target && error.target.src) {
-                    this.showError(`Model file not found: ${error.target.src}<br><br>
-                        Please check:<br>
-                        1. File exists at: assets/models/laptop.glb<br>
-                        2. File path is correct<br>
-                        3. Running on a web server (not file://)`);
-                } else {
-                    this.showError(`Failed to load 3D model.<br><br>
-                        Error: ${error.message || 'Unknown error'}<br><br>
-                        Please check:<br>
-                        1. File exists at: assets/models/laptop.glb<br>
-                        2. Running on a web server<br>
-                        3. GLB file is valid`);
-                }
+                console.error('Error loading model:', error);
+                this.loadingElement.innerHTML = `<div class="error">Failed to load 3D model. Please check the console for details.</div>`;
             }
         );
     }
 
-    scaleModel() {
+    scaleAndCenterModel() {
         if (!this.laptopModel) return;
 
-        // Calculate bounding box
         const box = new THREE.Box3().setFromObject(this.laptopModel);
         const size = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
-        
-        // Scale to fit nicely in view (target size of 3 units)
-        const targetSize = 3;
-        const scale = targetSize / maxDim;
+        const scale = 2.5 / maxDim; // target size ~2.5 units
+
         this.laptopModel.scale.setScalar(scale);
 
-        // Center the model
+        // Recompute bounding box after scaling
+        box.setFromObject(this.laptopModel);
         const center = box.getCenter(new THREE.Vector3());
-        this.laptopModel.position.sub(center.multiplyScalar(scale));
-        
-        // Position slightly above the ground
-        this.laptopModel.position.y = 0;
+
+        // Center model at origin, and position on ground (y=0)
+        this.laptopModel.position.x -= center.x;
+        this.laptopModel.position.z -= center.z;
+        this.laptopModel.position.y -= box.min.y;
     }
 
-    showError(message) {
-        this.loadingElement.innerHTML = `<div class="error">${message}</div>`;
+    findScreenMesh() {
+        if (!this.laptopModel) return;
+
+        const screenNames = ['screen', 'display', 'monitor'];
+
+        this.screenMesh = null;
+
+        this.laptopModel.traverse((child) => {
+            if (child.isMesh) {
+                const nameLower = child.name.toLowerCase();
+                for (const screenName of screenNames) {
+                    if (nameLower.includes(screenName)) {
+                        this.screenMesh = child;
+                        return;
+                    }
+                }
+            }
+        });
+
+        if (!this.screenMesh) {
+            console.warn('Screen mesh not found. Using laptop model center as fallback.');
+            this.screenMesh = this.laptopModel;
+        }
+    }
+
+    createAndPositionWebsite() {
+        const websiteElement = document.getElementById('laptop-website');
+        if (!websiteElement) return;
+
+        this.cssObject = new THREE.CSS3DObject(websiteElement);
+
+        // Compute screen bounding box in local space
+        const box = new THREE.Box3().setFromObject(this.screenMesh);
+        const size = box.getSize(new THREE.Vector3());
+
+        // Size and center of screen in world space
+        const center = box.getCenter(new THREE.Vector3());
+
+        // Position CSS3DObject at screen center
+        this.cssObject.position.copy(center);
+
+        // Copy rotation from screen mesh
+        this.cssObject.quaternion.copy(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
+
+        // Calculate scale to match screen size
+        // CSS3DObject size corresponds to CSS pixels, so scale accordingly
+        // We assume the CSS element is sized to match the screen's aspect ratio (width / height)
+        // We'll scale the CSS3DObject so that its size matches the screen size in 3D units
+        const elementWidth = websiteElement.offsetWidth;
+        const elementHeight = websiteElement.offsetHeight;
+        if (elementWidth === 0 || elementHeight === 0) {
+            console.warn('Website element has zero width or height. Cannot scale properly.');
+        } else {
+            const screenAspect = size.x / size.y;
+            const elementAspect = elementWidth / elementHeight;
+
+            // Scale factor to fit width or height depending on aspect ratio
+            let scale;
+            if (elementAspect > screenAspect) {
+                // Fit height
+                scale = size.y / elementHeight;
+            } else {
+                // Fit width
+                scale = size.x / elementWidth;
+            }
+            this.cssObject.scale.set(scale, scale, scale);
+        }
+
+        // Adjust rotation to avoid upside-down display (rotate 180 deg around Y if needed)
+        // Check if the CSS3DObject is upside down by comparing its up vector with world up
+        const upVector = new THREE.Vector3(0, 1, 0).applyQuaternion(this.cssObject.quaternion);
+        if (upVector.y < 0) {
+            // Rotate 180 degrees around screen normal (Z axis)
+            const rotationCorrection = new THREE.Quaternion();
+            rotationCorrection.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI);
+            this.cssObject.quaternion.multiply(rotationCorrection);
+        }
+
+        this.css3dScene.add(this.cssObject);
     }
 
     setupEventListeners() {
-        // Window resize
         window.addEventListener('resize', () => {
             this.camera.aspect = window.innerWidth / window.innerHeight;
             this.camera.updateProjectionMatrix();
-            this.renderer.setSize(window.innerWidth, window.innerHeight);
-        });
 
-        // Disable auto-rotate on user interaction
-        this.controls.addEventListener('start', () => {
-            this.controls.autoRotate = false;
-        });
-
-        // Re-enable auto-rotate after period of inactivity
-        let inactivityTimer;
-        this.controls.addEventListener('end', () => {
-            clearTimeout(inactivityTimer);
-            inactivityTimer = setTimeout(() => {
-                this.controls.autoRotate = false;
-            }, 3000); // 3 seconds of inactivity
-        });
-
-        // Handle touch events for mobile
-        this.renderer.domElement.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-        });
-
-        this.renderer.domElement.addEventListener('touchmove', (e) => {
-            e.preventDefault();
+            this.webglRenderer.setSize(window.innerWidth, window.innerHeight);
+            this.css3dRenderer.setSize(window.innerWidth, window.innerHeight);
         });
     }
 
     animate() {
         requestAnimationFrame(() => this.animate());
-        
-        // Update controls
+
         this.controls.update();
-        
-        // Update camera coordinates display
-        this.coordDiv.innerText = `Camera position: x=${this.camera.position.x.toFixed(2)}, y=${this.camera.position.y.toFixed(2)}, z=${this.camera.position.z.toFixed(2)}`;
-        
-        // Render scene
-        this.renderer.render(this.scene, this.camera);
+
+        this.webglRenderer.render(this.webglScene, this.camera);
+        this.css3dRenderer.render(this.css3dScene, this.camera);
     }
 }
 
-// Initialize the 3D viewer when page loads
 window.addEventListener('DOMContentLoaded', () => {
-    // Wait a moment for all scripts to fully load
     setTimeout(() => {
-        if (typeof THREE !== 'undefined' && THREE.OrbitControls && THREE.GLTFLoader) {
-            new Laptop3DViewer();
+        if (typeof THREE !== 'undefined' && THREE.OrbitControls && THREE.GLTFLoader && THREE.CSS3DRenderer) {
+            new InteractiveLaptopPortfolio();
         } else {
             console.error('Three.js dependencies not loaded:', {
                 THREE: typeof THREE !== 'undefined',
                 OrbitControls: !!(THREE && THREE.OrbitControls),
-                GLTFLoader: !!(THREE && THREE.GLTFLoader)
+                GLTFLoader: !!(THREE && THREE.GLTFLoader),
+                CSS3DRenderer: !!(THREE && THREE.CSS3DRenderer)
             });
-            document.getElementById('loading').innerHTML = 
-                '<div class="error">Failed to load Three.js libraries. Please refresh the page.</div>';
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.innerHTML = '<div class="error">Failed to load Three.js libraries. Please refresh the page.</div>';
+            }
         }
     }, 500);
 });

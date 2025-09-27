@@ -3,28 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Laptop Portfolio</title>
+    <title>Interactive Laptop Portfolio</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="canvas-container">
+    <div id="container">
+        <!-- Loading Screen -->
         <div class="loading" id="loading">
             <div class="loading-spinner"></div>
-            <div>Loading 3D Model...</div>
+            <div>Loading 3D Portfolio...</div>
         </div>
+
+        <!-- Controls Info -->
         <div class="controls-info">
-            <h3>Controls</h3>
+            <h3>3D Controls</h3>
             <div>🖱️ Left Click + Drag: Rotate</div>
             <div>🖱️ Right Click + Drag: Pan</div>
             <div>🖱️ Scroll: Zoom In/Out</div>
+            <div>💻 Laptop screen is fully interactive!</div>
+        </div>
+
+        <!-- Website Content (This will be rendered inside the laptop screen) -->
+        <div id="laptop-website">
+            <nav class="website-nav">
+                <button class="nav-btn active" onclick="showSection('home')">Home</button>
+                <button class="nav-btn" onclick="showSection('about')">About</button>
+                <button class="nav-btn" onclick="showSection('projects')">Projects</button>
+            </nav>
+
+            <div id="home" class="content-section active">
+                <div class="hero-section">
+                    <h1>Welcome to My Portfolio</h1>
+                    <p>Full-Stack Developer & 3D Enthusiast</p>
+                    <button class="cta-button" onclick="showSection('about')">Learn More About Me</button>
+                </div>
+            </div>
+
+            <div id="about" class="content-section">
+                <h2 style="text-align: center; margin-bottom: 40px; font-size: 36px;">About Me</h2>
+                <div class="about-grid">
+                    <div class="card">
+                        <h3>Skills</h3>
+                        <div>
+                            <p>JavaScript</p>
+                            <div class="skill-bar"><div class="skill-progress" style="width: 90%;"></div></div>
+                            <p>React</p>
+                            <div class="skill-bar"><div class="skill-progress" style="width: 85%;"></div></div>
+                            <p>Three.js</p>
+                            <div class="skill-bar"><div class="skill-progress" style="width: 80%;"></div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Experience</h3>
+                        <p>Passionate developer with expertise in creating interactive web experiences. I love combining traditional web development with cutting-edge 3D technologies.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="projects" class="content-section">
+                <h2 style="text-align: center; margin-bottom: 40px; font-size: 36px;">My Projects</h2>
+                <div class="projects-grid">
+                    <div class="card">
+                        <h3>3D Portfolio Site</h3>
+                        <p>Interactive portfolio website with Three.js integration and real HTML content displayed inside a 3D laptop model.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Web Application</h3>
+                        <p>Full-stack web application built with React, Node.js, and modern web technologies.</p>
+                    </div>
+                    <div class="card">
+                        <h3>3D Visualizations</h3>
+                        <p>Interactive data visualizations and 3D experiences using WebGL and Three.js.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Three.js with OrbitControls and GLTFLoader from reliable CDN -->
+    <!-- Three.js with OrbitControls, GLTFLoader, and CSS3DRenderer -->
     <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/renderers/CSS3DRenderer.js"></script>
     <!-- Main JavaScript -->
     <script src="main.js"></script>
+
+    <script>
+        // Website navigation functions (available globally)
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show target section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active to clicked button
+            event.target.classList.add('active');
+        }
+    </script>
 </body>
 </html>
