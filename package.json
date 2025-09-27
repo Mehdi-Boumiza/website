@@ -1,144 +1,32 @@
 {
-    "name": "devone-hackathon-portfolio-2025",
+    "name": "laptop-3d-viewer",
     "version": "1.0.0",
-    "description": "MIT-level hackathon portfolio showcasing AI/ML projects and research journey",
+    "description": "Interactive 3D laptop model viewer using Three.js",
     "main": "index.html",
     "scripts": {
       "start": "python -m http.server 8000",
       "serve": "npx serve .",
-      "dev": "npx live-server --port=3000 --host=localhost",
-      "build": "echo 'Static site - no build needed'",
-      "deploy-vercel": "vercel --prod",
-      "deploy-netlify": "netlify deploy --prod --dir .",
-      "lint": "echo 'Linting HTML, CSS, JS...' && npx htmlhint index.html",
-      "validate": "echo 'Validating portfolio structure...'",
-      "optimize": "echo 'Optimizing images and assets...'",
-      "test": "echo 'Running portfolio tests...'",
-      "backup": "git add . && git commit -m 'Portfolio backup' && git push"
+      "dev": "npx live-server"
     },
     "keywords": [
+      "threejs",
+      "3d",
+      "laptop",
       "portfolio",
-      "hackathon",
-      "AI",
-      "machine-learning",
-      "MIT",
-      "student",
-      "web-development",
-      "three-js",
-      "tailwind",
-      "tunisia"
+      "webgl",
+      "interactive"
     ],
-    "author": {
-      "name": "DevOne",
-      "email": "devone@example.com",
-      "url": "https://devone-portfolio-2025.vercel.app"
-    },
+    "author": "Your Name",
     "license": "MIT",
-    "homepage": "https://devone-portfolio-2025.vercel.app",
-    "repository": {
-      "type": "git",
-      "url": "https://github.com/devone/hackathon-portfolio-2025.git"
-    },
-    "bugs": {
-      "url": "https://github.com/devone/hackathon-portfolio-2025/issues"
-    },
-    "engines": {
-      "node": ">=16.0.0"
-    },
-    "dependencies": {},
     "devDependencies": {
       "live-server": "^1.2.2",
-      "serve": "^14.2.1",
-      "htmlhint": "^1.1.4",
-      "vercel": "^32.5.0",
-      "netlify-cli": "^17.0.0"
+      "serve": "^14.2.1"
     },
-    "browserslist": [
-      "> 1%",
-      "last 2 versions",
-      "not dead"
-    ],
-    "config": {
-      "port": 3000,
-      "host": "localhost"
+    "repository": {
+      "type": "git",
+      "url": "your-repo-url"
     },
-    "hackathon": {
-      "name": "DevOne Hackathon 2025",
-      "category": "Portfolio/Showcase",
-      "technologies": [
-        "HTML5",
-        "CSS3",
-        "JavaScript ES6+",
-        "Three.js",
-        "Tailwind CSS",
-        "Responsive Design"
-      ],
-      "features": [
-        "3D Background Animation",
-        "Dark/Light Mode",
-        "AI Chat Easter Egg",
-        "Responsive Design",
-        "Smooth Animations",
-        "Contact Form",
-        "Project Showcase",
-        "Blog Integration"
-      ],
-      "target": "MIT Application Portfolio"
-    },
-    "performance": {
-      "budget": {
-        "maximumFileSizeCssKb": 50,
-        "maximumFileSizeJsKb": 100,
-        "maximumLoadTimeMs": 3000
-      }
-    },
-    "seo": {
-      "title": "DevOne Portfolio 2025 | AI Researcher in the Making",
-      "description": "High school student from Tunisia passionate about AI/ML, building projects that solve real problems. MIT hopeful showcasing hackathon projects and research journey.",
-      "keywords": "AI researcher, machine learning, MIT application, hackathon portfolio, Tunisia, student developer",
-      "author": "DevOne",
-      "language": "en"
-    },
-    "deployment": {
-      "vercel": {
-        "framework": null,
-        "buildCommand": null,
-        "outputDirectory": "./",
-        "installCommand": null
-      },
-      "netlify": {
-        "build": {
-          "publish": ".",
-          "command": "echo 'Static site deployment'"
-        }
-      }
-    },
-    "project-structure": {
-      "core-files": [
-        "index.html",
-        "style.css", 
-        "main.js",
-        "README.md"
-      ],
-      "external-deps": [
-        "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js",
-        "https://cdn.tailwindcss.com",
-        "https://fonts.googleapis.com/css2?family=Inter"
-      ],
-      "features": {
-        "responsive": true,
-        "dark-mode": true,
-        "animations": true,
-        "3d-graphics": true,
-        "accessibility": true,
-        "seo-optimized": true
-      }
-    },
-    "contact": {
-      "email": "devone@example.com",
-      "github": "https://github.com/devone-portfolio",
-      "kaggle": "https://kaggle.com/devone2025",
-      "linkedin": "https://linkedin.com/in/devone-ai",
-      "devpost": "https://devpost.com/devone2025"
+    "engines": {
+      "node": ">=14.0.0"
     }
   }

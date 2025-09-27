@@ -1,325 +1,105 @@
-/* ==========================================================================
-   DevOne Portfolio 2025 - CSS Styles
-   ========================================================================== */
-
-/* Base Styles */
-body {
-    font-family: 'Inter', system-ui, sans-serif;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* Hero Section Gradient */
-.hero-gradient {
+body {
+    font-family: 'Arial', sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    overflow: hidden;
+    height: 100vh;
 }
 
-.dark .hero-gradient {
-    background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
-}
-
-/* Glass Effect for Navigation */
-.glass-effect {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.dark .glass-effect {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Project Card Hover Effect */
-.project-card:hover {
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
-}
-
-/* Custom Animations */
-@keyframes float {
-    0%, 100% { 
-        transform: translateY(0px); 
-    }
-    50% { 
-        transform: translateY(-20px); 
-    }
-}
-
-@keyframes glow {
-    0% { 
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); 
-    }
-    100% { 
-        box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); 
-    }
-}
-
-@keyframes slideUp {
-    0% { 
-        transform: translateY(100px); 
-        opacity: 0; 
-    }
-    100% { 
-        transform: translateY(0); 
-        opacity: 1; 
-    }
-}
-
-@keyframes fadeIn {
-    0% { 
-        opacity: 0; 
-    }
-    100% { 
-        opacity: 1; 
-    }
-}
-
-/* Animation Classes */
-.animate-float {
-    animation: float 6s ease-in-out infinite;
-}
-
-.animate-glow {
-    animation: glow 2s ease-in-out infinite alternate;
-}
-
-.animate-slide-up {
-    animation: slideUp 0.8s ease-out;
-}
-
-.animate-fade-in {
-    animation: fadeIn 1s ease-out;
-}
-
-/* Utility Classes for Intersection Observer */
-.fade-in-element {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-}
-
-.fade-in-element.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Project Card Base Styles */
-.project-card {
-    transition: all 0.3s ease;
-}
-
-/* Chat Modal Styles */
-#ai-chat-modal {
-    backdrop-filter: blur(5px);
-}
-
-#ai-chat-modal .bg-black {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-/* Loading Animation */
-body {
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-}
-
-body.loaded {
-    opacity: 1;
-}
-
-/* Responsive Design Enhancements */
-@media (max-width: 768px) {
-    .hero-gradient h1 {
-        font-size: 2.5rem;
-    }
-    
-    .hero-gradient p {
-        font-size: 1.125rem;
-    }
-    
-    .glass-effect {
-        backdrop-filter: blur(5px);
-    }
-}
-
-/* Focus States for Accessibility */
-.focus\:ring-2:focus {
-    outline: 2px solid transparent;
-    outline-offset: 2px;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
-}
-
-/* Form Input Enhancements */
-input[type="text"],
-input[type="email"],
-textarea {
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-input[type="text"]:focus,
-input[type="email"]:focus,
-textarea:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* Button Hover Effects */
-button {
-    transition: all 0.3s ease;
-}
-
-/* Navigation Link Hover Effects */
-nav a {
+#canvas-container {
+    width: 100vw;
+    height: 100vh;
     position: relative;
-    transition: color 0.3s ease;
 }
 
-nav a::after {
-    content: '';
+canvas {
+    display: block;
+    outline: none;
+}
+
+.loading {
     position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background-color: #3b82f6;
-    transition: width 0.3s ease;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 18px;
+    z-index: 1000;
+    text-align: center;
 }
 
-nav a:hover::after {
-    width: 100%;
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+    margin: 0 auto 20px;
 }
 
-/* Skill Card Animations */
-.skills section > div > div > div {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.skills section > div > div > div:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.dark .skills section > div > div > div:hover {
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-}
-
-/* Blog Card Hover Effects */
-article {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-article:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-.dark article:hover {
-    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
-}
-
-/* Contact Links Hover Effects */
-#contact a {
-    transition: all 0.3s ease;
-}
-
-#contact a:hover {
-    transform: translateX(5px);
-}
-
-/* Footer Enhancements */
-footer a {
-    transition: transform 0.3s ease;
-}
-
-footer a:hover {
-    transform: scale(1.2);
-}
-
-/* Chat Button Animation */
-#ai-chat-trigger button {
-    transition: all 0.3s ease;
-    animation: bounce 2s infinite;
-}
-
-#ai-chat-trigger button:hover {
-    transform: scale(1.1);
-    animation: none;
-}
-
-@keyframes bounce {
-    0%, 20%, 53%, 80%, 100% {
-        transform: translate3d(0, 0, 0);
-    }
-    40%, 43% {
-        transform: translate3d(0, -10px, 0);
-    }
-    70% {
-        transform: translate3d(0, -5px, 0);
-    }
-    90% {
-        transform: translate3d(0, -2px, 0);
+@keyframes spin {
+    to { 
+        transform: rotate(360deg); 
     }
 }
 
-/* Three.js Container */
-#three-container {
-    pointer-events: none;
-}
-
-#three-container canvas {
+.controls-info {
     position: absolute;
-    top: 0;
-    left: 0;
+    bottom: 20px;
+    left: 20px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.controls-info h3 {
+    margin-bottom: 10px;
+    color: white;
+}
+
+.error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ff6b6b;
+    font-size: 16px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 1000;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .controls-info {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        font-size: 12px;
+        padding: 10px;
+    }
+    
+    .loading {
+        font-size: 16px;
+        padding: 0 20px;
+    }
+}
+
+/* Ensure full viewport coverage */
+html, body {
     width: 100%;
     height: 100%;
-}
-
-/* Gradient Text Effects */
-.gradient-text {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* Dark mode specific adjustments */
-.dark .gradient-text {
-    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* Smooth scrolling for all browsers */
-html {
-    scroll-behavior: smooth;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-.dark ::-webkit-scrollbar-track {
-    background: #374151;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-    background: #6b7280;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #a1a1a1;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
+    margin: 0;
+    padding: 0;
 }
