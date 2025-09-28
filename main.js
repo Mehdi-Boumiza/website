@@ -27,7 +27,6 @@ class InteractiveLaptopPortfolio {
             0.1,
             1000
         );
-        this.camera.position.set(0, 1.5, 3);
 
         // WebGL scene and renderer
         this.webglScene = new THREE.Scene();
@@ -49,6 +48,7 @@ class InteractiveLaptopPortfolio {
         this.css3dRenderer.domElement.style.position = 'absolute';
         this.css3dRenderer.domElement.style.top = '0';
         this.css3dRenderer.domElement.style.left = '0';
+        this.css3dRenderer.domElement.style.pointerEvents = 'none'; // Keep pointer-events:none so controls remain responsive
         this.container.appendChild(this.css3dRenderer.domElement);
 
         // Lighting
@@ -100,6 +100,9 @@ class InteractiveLaptopPortfolio {
 
                 // Create and position CSS3D website
                 this.createAndPositionWebsite();
+
+                // Adjust camera and controls target to center on screen
+                this.adjustCameraAndControls();
 
                 // Hide loading element
                 this.loadingElement.style.display = 'none';
@@ -167,50 +170,94 @@ class InteractiveLaptopPortfolio {
         const box = new THREE.Box3().setFromObject(this.screenMesh);
         const size = box.getSize(new THREE.Vector3());
 
+        console.log(`📐 Screen dimensions: width=${size.x.toFixed(3)}, height=${size.y.toFixed(3)}, depth=${size.z.toFixed(3)}`);
+
         // Size and center of screen in world space
         const center = box.getCenter(new THREE.Vector3());
 
-        // Position CSS3DObject at screen center
-        this.cssObject.position.copy(center);
+        // Move website slightly in front of screen to avoid seeing it through the back
+        const screenNormal = new THREE.Vector3(0, 0, 1);
+        screenNormal.applyQuaternion(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
+        screenNormal.normalize();
+        this.cssObject.position.copy(center).add(screenNormal.multiplyScalar(0.01)); // slightly in front
 
-        // Copy rotation from screen mesh
+        // Copy world rotation from screen mesh to CSS3DObject
+        this.screenMesh.updateWorldMatrix(true, false);
         this.cssObject.quaternion.copy(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
 
-        // Calculate scale to match screen size
+        // Calculate scale to match screen size exactly
         // CSS3DObject size corresponds to CSS pixels, so scale accordingly
-        // We assume the CSS element is sized to match the screen's aspect ratio (width / height)
-        // We'll scale the CSS3DObject so that its size matches the screen size in 3D units
         const elementWidth = websiteElement.offsetWidth;
         const elementHeight = websiteElement.offsetHeight;
+
         if (elementWidth === 0 || elementHeight === 0) {
             console.warn('Website element has zero width or height. Cannot scale properly.');
+            this.cssObject.scale.set(1, 1, 1);
         } else {
-            const screenAspect = size.x / size.y;
-            const elementAspect = elementWidth / elementHeight;
-
-            // Scale factor to fit width or height depending on aspect ratio
-            let scale;
-            if (elementAspect > screenAspect) {
-                // Fit height
-                scale = size.y / elementHeight;
-            } else {
-                // Fit width
-                scale = size.x / elementWidth;
-            }
-            this.cssObject.scale.set(scale, scale, scale);
+            const scaleX = (size.x / elementWidth) * 0.98;
+            const scaleY = (size.y / elementHeight) * 0.95;
+            this.cssObject.scale.set(scaleX, scaleY, 1);
         }
 
-        // Adjust rotation to avoid upside-down display (rotate 180 deg around Y if needed)
-        // Check if the CSS3DObject is upside down by comparing its up vector with world up
-        const upVector = new THREE.Vector3(0, 1, 0).applyQuaternion(this.cssObject.quaternion);
-        if (upVector.y < 0) {
-            // Rotate 180 degrees around screen normal (Z axis)
-            const rotationCorrection = new THREE.Quaternion();
-            rotationCorrection.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI);
-            this.cssObject.quaternion.multiply(rotationCorrection);
-        }
+        // Flip website to face forward (toward camera)
+        // Rotate 180 degrees around Y axis relative to screen local space
+        const rotationCorrection = new THREE.Quaternion();
+        rotationCorrection.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+        this.cssObject.quaternion.multiply(rotationCorrection);
 
         this.css3dScene.add(this.cssObject);
+
+        // Create a black plane to cover the back of the screen
+        const boxBack = new THREE.Box3().setFromObject(this.screenMesh);
+        const sizeBack = boxBack.getSize(new THREE.Vector3());
+        const centerBack = boxBack.getCenter(new THREE.Vector3());
+
+        const backPlane = new THREE.Mesh(
+            new THREE.PlaneGeometry(sizeBack.x, sizeBack.y),
+            new THREE.MeshBasicMaterial({ color: 0x000000 })
+        );
+
+        // Position the plane slightly behind the screen along its normal
+        backPlane.position.copy(centerBack).add(screenNormal.multiplyScalar(-0.1)); // slightly further behind
+
+        // Match rotation of the screen
+        backPlane.quaternion.copy(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
+
+        // Add to WebGL scene
+        this.webglScene.add(backPlane);
+    }
+
+    adjustCameraAndControls() {
+        if (!this.screenMesh) return;
+
+        // Compute bounding box of the screen mesh in world coordinates
+        const box = new THREE.Box3().setFromObject(this.screenMesh);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+
+        // Set controls target to screen center
+        this.controls.target.copy(center);
+
+        // Position the camera so that the screen is fully visible
+        // Calculate distance based on screen size and camera FOV
+        const maxScreenDimension = Math.max(size.x, size.y);
+        const fov = this.camera.fov * (Math.PI / 180);
+        const distance = (maxScreenDimension / 2) / Math.tan(fov / 2);
+
+        // Position camera along the screen normal direction
+        // Get screen normal vector (Z axis in screen local space)
+        const screenNormal = new THREE.Vector3(0, 0, 1);
+        screenNormal.applyQuaternion(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
+        screenNormal.normalize();
+
+        // Position camera at some distance away from screen center along normal
+        const cameraPosition = center.clone().add(screenNormal.multiplyScalar(distance * 1.2)); // Slightly further to have margin
+        this.camera.position.copy(cameraPosition);
+
+        this.camera.lookAt(center);
+
+        // Update controls to new camera and target positions
+        this.controls.update();
     }
 
     setupEventListeners() {
@@ -220,6 +267,9 @@ class InteractiveLaptopPortfolio {
 
             this.webglRenderer.setSize(window.innerWidth, window.innerHeight);
             this.css3dRenderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        window.addEventListener('mousemove', (event) => {
+            console.log(`Mouse position: x=${event.clientX}, y=${event.clientY}`);
         });
     }
 

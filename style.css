@@ -101,6 +101,12 @@ canvas {
     overflow: hidden;
     font-family: 'Arial', sans-serif;
     cursor: pointer;
+    backface-visibility: hidden; /* Hide when viewed from back */
+    -webkit-backface-visibility: hidden; /* Safari support */
+    transform-style: preserve-3d;
+    border-radius: 8px; /* Rounded corners to match laptop screen */
+    border: 2px solid rgba(0, 0, 0, 0.8); /* Screen bezel effect */
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3); /* Inner shadow for depth */
 }
 
 .website-nav {
