@@ -194,7 +194,7 @@ class InteractiveLaptopPortfolio {
             console.warn('Website element has zero width or height. Cannot scale properly.');
             this.cssObject.scale.set(1, 1, 1);
         } else {
-            const scaleX = (size.x / elementWidth) * 0.98;
+            const scaleX = (size.x / elementWidth) * 0.99;
             const scaleY = (size.y / elementHeight) * 0.95;
             this.cssObject.scale.set(scaleX, scaleY, 1);
         }

@@ -17,63 +17,334 @@
         <!-- Controls Info -->
         <div class="controls-info">
             <h3>3D Controls</h3>
-            <div>🖱️ Left Click + Drag: Rotate</div>
-            <div>🖱️ Right Click + Drag: Pan</div>
-            <div>🖱️ Scroll: Zoom In/Out</div>
-            <div>💻 Laptop screen is fully interactive!</div>
+            <div> Left Click + Drag: Rotate</div>
+            <div> Right Click + Drag: Pan</div>
+            <div> Scroll: Zoom In/Out</div>
+            <div> Laptop screen is fully interactive</div>
         </div>
 
         <!-- Website Content (This will be rendered inside the laptop screen) -->
         <div id="laptop-website">
             <nav class="website-nav">
-                <button class="nav-btn active" onclick="showSection('home')">Home</button>
-                <button class="nav-btn" onclick="showSection('about')">About</button>
-                <button class="nav-btn" onclick="showSection('projects')">Projects</button>
+                <div class="nav-brand">Portfolio</div>
+                <div class="nav-buttons">
+                    <button class="nav-btn active" onclick="showSection('home')">
+                        <span class="nav-icon"></span>Home
+                    </button>
+                    <button class="nav-btn" onclick="showSection('projects')">
+                        <span class="nav-icon"></span>Projects
+                    </button>
+                    <button class="nav-btn" onclick="showSection('skills')">
+                        <span class="nav-icon"></span>Skills
+                    </button>
+                    <button class="nav-btn" onclick="showSection('about')">
+                        <span class="nav-icon"></span>About
+                    </button>
+                    <button class="nav-btn" onclick="showSection('contact')">
+                        <span class="nav-icon"></span>Contact
+                    </button>
+                </div>
             </nav>
 
+            <!-- HOME SECTION -->
             <div id="home" class="content-section active">
                 <div class="hero-section">
-                    <h1>Welcome to My Portfolio</h1>
-                    <p>Full-Stack Developer & 3D Enthusiast</p>
-                    <button class="cta-button" onclick="showSection('about')">Learn More About Me</button>
-                </div>
-            </div>
-
-            <div id="about" class="content-section">
-                <h2 style="text-align: center; margin-bottom: 40px; font-size: 36px;">About Me</h2>
-                <div class="about-grid">
-                    <div class="card">
-                        <h3>Skills</h3>
-                        <div>
-                            <p>JavaScript</p>
-                            <div class="skill-bar"><div class="skill-progress" style="width: 90%;"></div></div>
-                            <p>React</p>
-                            <div class="skill-bar"><div class="skill-progress" style="width: 85%;"></div></div>
-                            <p>Three.js</p>
-                            <div class="skill-bar"><div class="skill-progress" style="width: 80%;"></div></div>
+                    <div class="hero-content">
+                        <div class="hero-text">
+                            <h1 class="hero-title">Hi, I'm <span class="highlight">Mehdi!</span></h1>
+                            <p class="hero-tagline">Building Interactive AI & 3D Experiences</p>
+                            <p class="hero-description">
+                                Passionate developer creating web applications that combine 
+                                artificial intelligence with 3D technologies.
+                            </p>
+                            <div class="hero-buttons">
+                                <button class="cta-button primary" onclick="showSection('projects')">
+                                    View My Projects
+                                </button>
+                                <button class="cta-button secondary" onclick="showSection('contact')">
+                                    Get In Touch
+                                </button>
+                            </div>
+                        </div>
+                        <div class="hero-visual">
+                            <div class="floating-elements">
+                                <div class="float-element" style="--delay: 0s">🤖</div>
+                                <div class="float-element" style="--delay: 0.5s">🎯</div>
+                                <div class="float-element" style="--delay: 1s">💡</div>
+                                <div class="float-element" style="--delay: 1.5s">🌐</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="card">
-                        <h3>Experience</h3>
-                        <p>Passionate developer with expertise in creating interactive web experiences. I love combining traditional web development with cutting-edge 3D technologies.</p>
+                </div>
+            </div>
+
+            <!-- PROJECTS SECTION -->
+            <div id="projects" class="content-section">
+                <div class="section-header">
+                    <h2>Featured Projects</h2>
+                    <p>AI powered and interactive web experiences</p>
+                </div>
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <div class="project-content">
+                            <div class="project-tags">
+                                <span class="tag">JavaScript</span>
+                                <span class="tag">HTML</span>
+                            </div>
+                            <h3>MarketPlace for Students</h3>
+                            <p>A website built using HTML and JavaScript for students to trade, buy or sell their student materials that they don't use anymore.</p>
+                            <a href="#" class="project-link">View on GitHub →</a>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <div class="project-content">
+                            <div class="project-tags">
+                                <span class="tag">AI/ML</span>
+                                <span class="tag">Python</span>
+                                <span class="tag">FastAPI</span>
+                            </div>
+                            <h3>AI Student Assistant/ Teacher</h3>
+                            <p>Smart AI model designed to help students that face some hardship in their learning journey.</p>
+                            <a href="https://github.com/Mehdi-Boumiza/AI-student-assistant" class="project-link">View on GitHub →</a>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <div class="project-content">
+                            <div class="project-tags">
+                                <span class="tag">Pytorch</span>
+                                <span class="tag">Python</span>
+                                <span class="tag">Numpy/Pandas</span>
+                            </div>
+                            <h3>AI Cold Caller</h3>
+                            <p>An AI model built to cold call leads for a real estate agency and classify them depending on their interest while keeping everything tracked in an organized spreadsheet.</p>
+                            <a href="#" class="project-link">View on GitHub →</a>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <div class="project-content">
+                            <div class="project-tags">
+                                <span class="tag">AI</span>
+                                <span class="tag">Python</span>
+                                <span class="tag">TensorFlow</span>
+                            </div>
+                            <h3>Cover Letter Web App</h3>
+                            <p>An Amazing Web App designed to help student build and develop their cover letters Professionally in a click of a button.</p>
+                            <a href="https://github.com/Mehdi-Boumiza/Cover-Letter" class="project-link">View on GitHub →</a>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div id="projects" class="content-section">
-                <h2 style="text-align: center; margin-bottom: 40px; font-size: 36px;">My Projects</h2>
-                <div class="projects-grid">
-                    <div class="card">
-                        <h3>3D Portfolio Site</h3>
-                        <p>Interactive portfolio website with Three.js integration and real HTML content displayed inside a 3D laptop model.</p>
+            <!-- SKILLS SECTION -->
+            <div id="skills" class="content-section">
+                <div class="section-header">
+                    <h2>Skills & Technologies</h2>
+                    <p>The tools I use to bring ideas to life</p>
+                </div>
+                <div class="skills-grid">
+                    <div class="skill-category">
+                        <h3>AI & Machine Learning</h3>
+                        <div class="skills-list">
+                            <div class="skill-item">
+                                <span class="skill-name">Python/TensorFlow/Pytorch</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 90%;" data-skill="90"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">OpenAI APIs</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 85%;" data-skill="85"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">Computer Vision</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 80%;" data-skill="80"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">NLP/LangChain</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 75%;" data-skill="75"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card">
-                        <h3>Web Application</h3>
-                        <p>Full-stack web application built with React, Node.js, and modern web technologies.</p>
+                    <div class="skill-category">
+                        <h3>3D & Interactive</h3>
+                        <div class="skills-list">
+                            <div class="skill-item">
+                                <span class="skill-name">Three.js</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 70%;" data-skill="70"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">Blender/3D Modeling</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 70%;" data-skill="70"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">CSS3D/Animations</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 85%;" data-skill="85"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card">
-                        <h3>3D Visualizations</h3>
-                        <p>Interactive data visualizations and 3D experiences using WebGL and Three.js.</p>
+                    <div class="skill-category">
+                        <h3>Web Development</h3>
+                        <div class="skills-list">
+                            <div class="skill-item">
+                                <span class="skill-name">JavaScript</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 80%;" data-skill="80"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <span class="skill-name">React</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 70%;" data-skill="70"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Tools & Platforms</h3>
+                        <div class="tools-grid">
+                            <div class="tool-item">Git/GitHub</div>
+                            <div class="tool-item">Blender</div>
+                            <div class="tool-item">Sketchfab</div>
+                            <div class="tool-item">VS Code</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABOUT SECTION -->
+            <div id="about" class="content-section">
+                <div class="section-header">
+                    <h2>About Me</h2>
+                    <p>Passionate about AI and interactive experiences</p>
+                </div>
+                <div class="about-content">
+                    <div class="about-text">
+                        <div class="profile-section">
+                            <div class="profile-photo">
+                                <div class="photo-placeholder">
+                                    <span>📸</span>
+                                    <p>Your Photo</p>
+                                </div>
+                            </div>
+                            <div class="profile-info">
+                                <h3>Full-Stack Developer & AI Enthusiast</h3>
+                                <p>
+                                    I'm passionate about creating innovative web experiences that blend artificial intelligence 
+                                    with immersive 3D technologies. My journey started with traditional web development, 
+                                    but I quickly became fascinated by the possibilities of AI and interactive 3D graphics.
+                                </p>
+                                <p>
+                                    Currently, I focus on building applications that push the boundaries of what's possible 
+                                    on the web - from AI-powered content generation to real-time 3D visualizations. 
+                                    I believe the future of web development lies in creating experiences that are not just 
+                                    functional, but truly engaging and intelligent.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="interests-section">
+                            <h3>What Drives Me</h3>
+                            <div class="interests-grid">
+                                <div class="interest-item">
+                                    <div class="interest-icon">🤖</div>
+                                    <div class="interest-text">
+                                        <h4>Artificial Intelligence</h4>
+                                        <p>Exploring the potential of AI in web applications</p>
+                                    </div>
+                                </div>
+                                <div class="interest-item">
+                                    <div class="interest-icon">🎯</div>
+                                    <div class="interest-text">
+                                        <h4>3D Web Experiences</h4>
+                                        <p>Creating immersive and interactive 3D interfaces</p>
+                                    </div>
+                                </div>
+                                <div class="interest-item">
+                                    <div class="interest-icon">💡</div>
+                                    <div class="interest-text">
+                                        <h4>Innovation</h4>
+                                        <p>Always looking for new ways to solve problems</p>
+                                    </div>
+                                </div>
+                                <div class="interest-item">
+                                    <div class="interest-icon">🌐</div>
+                                    <div class="interest-text">
+                                        <h4>Open Source</h4>
+                                        <p>Contributing to the developer community</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTACT SECTION -->
+            <div id="contact" class="content-section">
+                <div class="section-header">
+                    <h2>Get In Touch</h2>
+                    <p>Let's collaborate on something amazing</p>
+                </div>
+                <div class="contact-content">
+                    <div class="contact-form">
+                        <form class="form">
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" id="name" name="name" class="form-input" placeholder="Your Name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" class="form-input" placeholder="your.email@example.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Message</label>
+                                <textarea id="message" name="message" class="form-textarea" placeholder="Tell me about your project idea..." rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="form-submit">Send Message</button>
+                        </form>
+                    </div>
+                    <div class="contact-links">
+                        <div class="contact-info">
+                            <h3>Connect With Me</h3>
+                            <p>Feel free to reach out through any of these platforms:</p>
+                        </div>
+                        <div class="social-links">
+                            <a href="#" class="social-link github">
+                                <span class="social-icon">🐙</span>
+                                <div class="social-text">
+                                    <strong>GitHub</strong>
+                                    <span>View my code</span>
+                                </div>
+                            </a>
+                            <a href="#" class="social-link linkedin">
+                                <span class="social-icon">💼</span>
+                                <div class="social-text">
+                                    <strong>LinkedIn</strong>
+                                    <span>Professional network</span>
+                                </div>
+                            </a>
+                            <a href="#" class="social-link devpost">
+                                <span class="social-icon">🏆</span>
+                                <div class="social-text">
+                                    <strong>Devpost</strong>
+                                    <span>Hackathon projects</span>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -106,7 +377,133 @@
             
             // Add active to clicked button
             event.target.classList.add('active');
+
+            // Trigger animations for the new section
+            triggerSectionAnimations(sectionId);
         }
+
+        function triggerSectionAnimations(sectionId) {
+            const section = document.getElementById(sectionId);
+            
+            if (sectionId === 'home') {
+                startTypingAnimation();
+            } else if (sectionId === 'about') {
+                animateStats();
+            } else if (sectionId === 'skills') {
+                animateSkillBars();
+            }
+        }
+
+        // Typing animation for home section
+        function startTypingAnimation() {
+            const textArray = [
+                'Full-Stack Developer',
+                '3D Web Specialist',
+                'UI/UX Designer',
+                'Problem Solver'
+            ];
+            const typedTextSpan = document.querySelector('.typed-text');
+            const cursor = document.querySelector('.cursor');
+            
+            let textArrayIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            
+            function typeText() {
+                const currentText = textArray[textArrayIndex];
+                
+                if (isDeleting) {
+                    typedTextSpan.textContent = currentText.substring(0, charIndex - 1);
+                    charIndex--;
+                } else {
+                    typedTextSpan.textContent = currentText.substring(0, charIndex + 1);
+                    charIndex++;
+                }
+                
+                let typeSpeed = isDeleting ? 100 : 150;
+                
+                if (!isDeleting && charIndex === currentText.length) {
+                    typeSpeed = 2000; // Pause at end
+                    isDeleting = true;
+                } else if (isDeleting && charIndex === 0) {
+                    isDeleting = false;
+                    textArrayIndex = (textArrayIndex + 1) % textArray.length;
+                    typeSpeed = 500; // Pause before next word
+                }
+                
+                setTimeout(typeText, typeSpeed);
+            }
+            
+            // Start typing animation
+            setTimeout(typeText, 1000);
+        }
+
+        // Animate statistics counters
+        function animateStats() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            
+            statNumbers.forEach(stat => {
+                const target = parseInt(stat.getAttribute('data-target'));
+                const increment = target / 60; // 60 frames for smooth animation
+                let current = 0;
+                
+                const updateCount = () => {
+                    if (current < target) {
+                        current += increment;
+                        stat.textContent = Math.ceil(current);
+                        requestAnimationFrame(updateCount);
+                    } else {
+                        stat.textContent = target;
+                    }
+                };
+                
+                updateCount();
+            });
+        }
+
+        // Animate skill bars
+        function animateSkillBars() {
+            const skillBars = document.querySelectorAll('.skill-progress');
+            
+            skillBars.forEach((bar, index) => {
+                setTimeout(() => {
+                    bar.style.transform = 'scaleX(1)';
+                    bar.style.transformOrigin = 'left';
+                    bar.style.transition = 'transform 1.5s ease-in-out';
+                }, index * 200);
+            });
+        }
+
+        // Initialize animations when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Start with home animations
+            setTimeout(() => {
+                startTypingAnimation();
+            }, 2000);
+            
+            // Form submission
+            const form = document.querySelector('.form');
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const submitBtn = form.querySelector('.form-submit');
+                    const originalText = submitBtn.textContent;
+                    
+                    submitBtn.textContent = 'Sending...';
+                    submitBtn.disabled = true;
+                    
+                    // Simulate form submission
+                    setTimeout(() => {
+                        submitBtn.textContent = 'Message Sent!';
+                        setTimeout(() => {
+                            submitBtn.textContent = originalText;
+                            submitBtn.disabled = false;
+                            form.reset();
+                        }, 2000);
+                    }, 1500);
+                });
+            }
+        });
     </script>
 </body>
 </html>
