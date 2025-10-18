@@ -20,7 +20,6 @@ class InteractiveLaptopPortfolio {
     }
 
     init() {
-        // Camera setup: position in front of laptop screen
         this.camera = new THREE.PerspectiveCamera(
             45,
             window.innerWidth / window.innerHeight,
@@ -28,7 +27,6 @@ class InteractiveLaptopPortfolio {
             1000
         );
 
-        // WebGL scene and renderer
         this.webglScene = new THREE.Scene();
         this.webglScene.background = new THREE.Color(0x1a1a2e);
 
@@ -40,7 +38,6 @@ class InteractiveLaptopPortfolio {
         this.webglRenderer.outputEncoding = THREE.sRGBEncoding;
         this.container.appendChild(this.webglRenderer.domElement);
 
-        // CSS3D scene and renderer
         this.css3dScene = new THREE.Scene();
 
         this.css3dRenderer = new THREE.CSS3DRenderer();
@@ -48,10 +45,9 @@ class InteractiveLaptopPortfolio {
         this.css3dRenderer.domElement.style.position = 'absolute';
         this.css3dRenderer.domElement.style.top = '0';
         this.css3dRenderer.domElement.style.left = '0';
-        this.css3dRenderer.domElement.style.pointerEvents = 'none'; // Keep pointer-events:none so controls remain responsive
+        this.css3dRenderer.domElement.style.pointerEvents = 'none'; 
         this.container.appendChild(this.css3dRenderer.domElement);
 
-        // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         this.webglScene.add(ambientLight);
 
@@ -60,7 +56,7 @@ class InteractiveLaptopPortfolio {
         directionalLight.castShadow = true;
         this.webglScene.add(directionalLight);
 
-        // Controls always enabled for free movement
+        //controls
         this.controls = new THREE.OrbitControls(this.camera, this.webglRenderer.domElement);
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.05;
@@ -78,7 +74,6 @@ class InteractiveLaptopPortfolio {
             (gltf) => {
                 this.laptopModel = gltf.scene;
 
-                // Enable shadows on meshes
                 this.laptopModel.traverse((child) => {
                     if (child.isMesh) {
                         child.castShadow = true;
@@ -89,28 +84,23 @@ class InteractiveLaptopPortfolio {
                     }
                 });
 
-                // Scale and center model
+                // scale
                 this.scaleAndCenterModel();
 
-                // Add model to scene
                 this.webglScene.add(this.laptopModel);
 
-                // Find screen mesh
                 this.findScreenMesh();
 
-                // Create and position CSS3D website
                 this.createAndPositionWebsite();
-
-                // Adjust camera and controls target to center on screen
+                //target camera
                 this.adjustCameraAndControls();
 
-                // Hide loading element
                 this.loadingElement.style.display = 'none';
             },
             undefined,
             (error) => {
-                console.error('Error loading model:', error);
-                this.loadingElement.innerHTML = `<div class="error">Failed to load 3D model. Please check the console for details.</div>`;
+                console.error('Error loading:', error);
+                this.loadingElement.innerHTML = `<div class="error">Failed to load</div>`;
             }
         );
     }
@@ -121,15 +111,14 @@ class InteractiveLaptopPortfolio {
         const box = new THREE.Box3().setFromObject(this.laptopModel);
         const size = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 2.5 / maxDim; // target size ~2.5 units
+        const scale = 2.5 / maxDim; 
 
         this.laptopModel.scale.setScalar(scale);
 
-        // Recompute bounding box after scaling
         box.setFromObject(this.laptopModel);
         const center = box.getCenter(new THREE.Vector3());
 
-        // Center model at origin, and position on ground (y=0)
+        // position on ground
         this.laptopModel.position.x -= center.x;
         this.laptopModel.position.z -= center.z;
         this.laptopModel.position.y -= box.min.y;
@@ -155,7 +144,7 @@ class InteractiveLaptopPortfolio {
         });
 
         if (!this.screenMesh) {
-            console.warn('Screen mesh not found. Using laptop model center as fallback.');
+            console.warn('screen mesh not found');
             this.screenMesh = this.laptopModel;
         }
     }
@@ -166,32 +155,28 @@ class InteractiveLaptopPortfolio {
 
         this.cssObject = new THREE.CSS3DObject(websiteElement);
 
-        // Compute screen bounding box in local space
         const box = new THREE.Box3().setFromObject(this.screenMesh);
         const size = box.getSize(new THREE.Vector3());
 
-        console.log(`📐 Screen dimensions: width=${size.x.toFixed(3)}, height=${size.y.toFixed(3)}, depth=${size.z.toFixed(3)}`);
+        console.log(` Screen dimensions: width=${size.x.toFixed(3)}, height=${size.y.toFixed(3)}, depth=${size.z.toFixed(3)}`);
 
-        // Size and center of screen in world space
         const center = box.getCenter(new THREE.Vector3());
 
-        // Move website slightly in front of screen to avoid seeing it through the back
+        // screen stuck in between so move it in front a bit
         const screenNormal = new THREE.Vector3(0, 0, 1);
         screenNormal.applyQuaternion(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
         screenNormal.normalize();
-        this.cssObject.position.copy(center).add(screenNormal.multiplyScalar(0.01)); // slightly in front
+        this.cssObject.position.copy(center).add(screenNormal.multiplyScalar(-0.02)); 
 
-        // Copy world rotation from screen mesh to CSS3DObject
         this.screenMesh.updateWorldMatrix(true, false);
         this.cssObject.quaternion.copy(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
 
-        // Calculate scale to match screen size exactly
-        // CSS3DObject size corresponds to CSS pixels, so scale accordingly
+        // calculate scale to match screen size 
         const elementWidth = websiteElement.offsetWidth;
         const elementHeight = websiteElement.offsetHeight;
 
         if (elementWidth === 0 || elementHeight === 0) {
-            console.warn('Website element has zero width or height. Cannot scale properly.');
+            console.warn('cant scale');
             this.cssObject.scale.set(1, 1, 1);
         } else {
             const scaleX = (size.x / elementWidth) * 0.99;
@@ -199,15 +184,14 @@ class InteractiveLaptopPortfolio {
             this.cssObject.scale.set(scaleX, scaleY, 1);
         }
 
-        // Flip website to face forward (toward camera)
-        // Rotate 180 degrees around Y axis relative to screen local space
+        // flip website toward camera
         const rotationCorrection = new THREE.Quaternion();
         rotationCorrection.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
         this.cssObject.quaternion.multiply(rotationCorrection);
 
         this.css3dScene.add(this.cssObject);
 
-        // Create a black plane to cover the back of the screen
+        // black screen to hide the back
         const boxBack = new THREE.Box3().setFromObject(this.screenMesh);
         const sizeBack = boxBack.getSize(new THREE.Vector3());
         const centerBack = boxBack.getCenter(new THREE.Vector3());
@@ -217,13 +201,18 @@ class InteractiveLaptopPortfolio {
             new THREE.MeshBasicMaterial({ color: 0x000000 })
         );
 
-        // Position the plane slightly behind the screen along its normal
-        backPlane.position.copy(centerBack).add(screenNormal.multiplyScalar(-0.1)); // slightly further behind
+        // plane behind screen
+        backPlane.position.copy(centerBack).add(screenNormal.multiplyScalar(-10)); 
 
-        // Match rotation of the screen
+            // Match rotation of the screen
         backPlane.quaternion.copy(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
 
-        // Add to WebGL scene
+            // Ensure it's fully opaque and double-sided to block light through back faces
+        backPlane.material.side = THREE.DoubleSide;
+        backPlane.material.transparent = false;
+        backPlane.material.depthWrite = true;
+
+            // Add to WebGL scene (behind the screen)
         this.webglScene.add(backPlane);
     }
 
