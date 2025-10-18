@@ -191,28 +191,29 @@ class InteractiveLaptopPortfolio {
 
         this.css3dScene.add(this.cssObject);
 
-        // black screen to hide the back
+        // black plane directly behind screen (non-transparent, blocks back side)
         const boxBack = new THREE.Box3().setFromObject(this.screenMesh);
         const sizeBack = boxBack.getSize(new THREE.Vector3());
         const centerBack = boxBack.getCenter(new THREE.Vector3());
+
+        // Use a fresh normal for backPlane placement (screenNormal was modified above)
+        const screenNormalForBack = new THREE.Vector3(0, 0, 1);
+        screenNormalForBack.applyQuaternion(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
+        screenNormalForBack.normalize();
 
         const backPlane = new THREE.Mesh(
             new THREE.PlaneGeometry(sizeBack.x, sizeBack.y),
             new THREE.MeshBasicMaterial({ color: 0x000000 })
         );
-
-        // plane behind screen
-        backPlane.position.copy(centerBack).add(screenNormal.multiplyScalar(-10)); 
-
-            // Match rotation of the screen
+        // Place just behind the screen (very close)
+        backPlane.position.copy(centerBack).add(screenNormalForBack.multiplyScalar(-0.001));
+        // Match rotation of the screen
         backPlane.quaternion.copy(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
-
-            // Ensure it's fully opaque and double-sided to block light through back faces
-        backPlane.material.side = THREE.DoubleSide;
+        // Only show on front side (blocks view from behind)
+        backPlane.material.side = THREE.FrontSide;
         backPlane.material.transparent = false;
         backPlane.material.depthWrite = true;
-
-            // Add to WebGL scene (behind the screen)
+        // Add to WebGL scene
         this.webglScene.add(backPlane);
     }
 
@@ -266,6 +267,17 @@ class InteractiveLaptopPortfolio {
         requestAnimationFrame(() => this.animate());
 
         this.controls.update();
+
+        // Hide CSS3D website when camera is behind the laptop screen
+        if (this.screenMesh && this.cssObject) {
+            const screenNormal = new THREE.Vector3(0, 0, 1);
+            screenNormal.applyQuaternion(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
+            const cameraDirection = new THREE.Vector3().subVectors(this.camera.position, this.screenMesh.getWorldPosition(new THREE.Vector3()));
+            const dot = screenNormal.dot(cameraDirection.normalize());
+
+            // Hide CSS3DObject when camera is behind or at an angle facing away from the screen
+            this.cssObject.element.style.display = dot > 0.25 ? 'block' : 'none';
+        }
 
         this.webglRenderer.render(this.webglScene, this.camera);
         this.css3dRenderer.render(this.css3dScene, this.camera);
