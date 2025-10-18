@@ -36,6 +36,7 @@ class InteractiveLaptopPortfolio {
         this.webglRenderer.shadowMap.enabled = true;
         this.webglRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.webglRenderer.outputEncoding = THREE.sRGBEncoding;
+        this.webglRenderer.domElement.style.zIndex = '2';
         this.container.appendChild(this.webglRenderer.domElement);
 
         this.css3dScene = new THREE.Scene();
@@ -45,7 +46,8 @@ class InteractiveLaptopPortfolio {
         this.css3dRenderer.domElement.style.position = 'absolute';
         this.css3dRenderer.domElement.style.top = '0';
         this.css3dRenderer.domElement.style.left = '0';
-        this.css3dRenderer.domElement.style.pointerEvents = 'none'; 
+        this.css3dRenderer.domElement.style.pointerEvents = 'none';
+        this.css3dRenderer.domElement.style.zIndex = '1';
         this.container.appendChild(this.css3dRenderer.domElement);
 
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -56,7 +58,6 @@ class InteractiveLaptopPortfolio {
         directionalLight.castShadow = true;
         this.webglScene.add(directionalLight);
 
-        //controls
         this.controls = new THREE.OrbitControls(this.camera, this.webglRenderer.domElement);
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.05;
@@ -84,15 +85,10 @@ class InteractiveLaptopPortfolio {
                     }
                 });
 
-                // scale
                 this.scaleAndCenterModel();
-
                 this.webglScene.add(this.laptopModel);
-
                 this.findScreenMesh();
-
                 this.createAndPositionWebsite();
-                //target camera
                 this.adjustCameraAndControls();
 
                 this.loadingElement.style.display = 'none';
@@ -118,7 +114,6 @@ class InteractiveLaptopPortfolio {
         box.setFromObject(this.laptopModel);
         const center = box.getCenter(new THREE.Vector3());
 
-        // position on ground
         this.laptopModel.position.x -= center.x;
         this.laptopModel.position.z -= center.z;
         this.laptopModel.position.y -= box.min.y;
@@ -128,7 +123,6 @@ class InteractiveLaptopPortfolio {
         if (!this.laptopModel) return;
 
         const screenNames = ['screen', 'display', 'monitor'];
-
         this.screenMesh = null;
 
         this.laptopModel.traverse((child) => {
@@ -144,7 +138,7 @@ class InteractiveLaptopPortfolio {
         });
 
         if (!this.screenMesh) {
-            console.warn('screen mesh not found');
+            console.warn('Screen mesh not found, using entire model as fallback');
             this.screenMesh = this.laptopModel;
         }
     }
@@ -157,26 +151,22 @@ class InteractiveLaptopPortfolio {
 
         const box = new THREE.Box3().setFromObject(this.screenMesh);
         const size = box.getSize(new THREE.Vector3());
-
-        console.log(` Screen dimensions: width=${size.x.toFixed(3)}, height=${size.y.toFixed(3)}, depth=${size.z.toFixed(3)}`);
-
         const center = box.getCenter(new THREE.Vector3());
 
-        // screen stuck in between so move it in front a bit
         const screenNormal = new THREE.Vector3(0, 0, 1);
         screenNormal.applyQuaternion(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
         screenNormal.normalize();
-        this.cssObject.position.copy(center).add(screenNormal.multiplyScalar(-0.02)); 
+        
+        this.cssObject.position.copy(center).add(screenNormal.multiplyScalar(-0.02));
 
         this.screenMesh.updateWorldMatrix(true, false);
         this.cssObject.quaternion.copy(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
 
-        // calculate scale to match screen size 
         const elementWidth = websiteElement.offsetWidth;
         const elementHeight = websiteElement.offsetHeight;
 
         if (elementWidth === 0 || elementHeight === 0) {
-            console.warn('cant scale');
+            console.warn('Website element has no dimensions, using default scale');
             this.cssObject.scale.set(1, 1, 1);
         } else {
             const scaleX = (size.x / elementWidth) * 0.99;
@@ -184,69 +174,40 @@ class InteractiveLaptopPortfolio {
             this.cssObject.scale.set(scaleX, scaleY, 1);
         }
 
-        // flip website toward camera
         const rotationCorrection = new THREE.Quaternion();
         rotationCorrection.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
         this.cssObject.quaternion.multiply(rotationCorrection);
 
         this.css3dScene.add(this.cssObject);
 
-        // black plane directly behind screen (non-transparent, blocks back side)
-        const boxBack = new THREE.Box3().setFromObject(this.screenMesh);
-        const sizeBack = boxBack.getSize(new THREE.Vector3());
-        const centerBack = boxBack.getCenter(new THREE.Vector3());
-
-        // Use a fresh normal for backPlane placement (screenNormal was modified above)
-        const screenNormalForBack = new THREE.Vector3(0, 0, 1);
-        screenNormalForBack.applyQuaternion(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
-        screenNormalForBack.normalize();
-
-        const backPlane = new THREE.Mesh(
-            new THREE.PlaneGeometry(sizeBack.x, sizeBack.y),
-            new THREE.MeshBasicMaterial({ color: 0x000000 })
-        );
-        // Place just behind the screen (very close)
-        backPlane.position.copy(centerBack).add(screenNormalForBack.multiplyScalar(-0.001));
-        // Match rotation of the screen
-        backPlane.quaternion.copy(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
-        // Only show on front side (blocks view from behind)
-        backPlane.material.side = THREE.FrontSide;
-        backPlane.material.transparent = false;
-        backPlane.material.depthWrite = true;
-        // Add to WebGL scene
-        this.webglScene.add(backPlane);
+        // Make the actual screen mesh invisible but keep it for collision/depth
+        if (this.screenMesh.material) {
+            this.screenMesh.material.opacity = 0;
+            this.screenMesh.material.transparent = true;
+        }
     }
 
     adjustCameraAndControls() {
         if (!this.screenMesh) return;
 
-        // Compute bounding box of the screen mesh in world coordinates
         const box = new THREE.Box3().setFromObject(this.screenMesh);
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
 
-        // Set controls target to screen center
         this.controls.target.copy(center);
 
-        // Position the camera so that the screen is fully visible
-        // Calculate distance based on screen size and camera FOV
         const maxScreenDimension = Math.max(size.x, size.y);
         const fov = this.camera.fov * (Math.PI / 180);
         const distance = (maxScreenDimension / 2) / Math.tan(fov / 2);
 
-        // Position camera along the screen normal direction
-        // Get screen normal vector (Z axis in screen local space)
         const screenNormal = new THREE.Vector3(0, 0, 1);
         screenNormal.applyQuaternion(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
         screenNormal.normalize();
 
-        // Position camera at some distance away from screen center along normal
-        const cameraPosition = center.clone().add(screenNormal.multiplyScalar(distance * 1.2)); // Slightly further to have margin
+        const cameraPosition = center.clone().add(screenNormal.multiplyScalar(distance * 1.2));
         this.camera.position.copy(cameraPosition);
-
         this.camera.lookAt(center);
 
-        // Update controls to new camera and target positions
         this.controls.update();
     }
 
@@ -258,26 +219,40 @@ class InteractiveLaptopPortfolio {
             this.webglRenderer.setSize(window.innerWidth, window.innerHeight);
             this.css3dRenderer.setSize(window.innerWidth, window.innerHeight);
         });
-        window.addEventListener('mousemove', (event) => {
-            console.log(`Mouse position: x=${event.clientX}, y=${event.clientY}`);
-        });
+    }
+
+    updateWebsiteVisibility() {
+        if (!this.screenMesh || !this.cssObject) return;
+
+        const screenNormal = new THREE.Vector3(0, 0, 1);
+        screenNormal.applyQuaternion(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
+        screenNormal.normalize();
+
+        const screenWorldPos = new THREE.Vector3();
+        this.screenMesh.getWorldPosition(screenWorldPos);
+
+        const cameraDirection = new THREE.Vector3();
+        cameraDirection.subVectors(this.camera.position, screenWorldPos);
+        cameraDirection.normalize();
+
+        const dotProduct = screenNormal.dot(cameraDirection);
+
+        // Show website only when viewing from the front (dot < -0.1 for this model)
+        // Add smooth opacity transition
+        if (dotProduct < -0.1) {
+            this.cssObject.element.style.display = 'block';
+            this.cssObject.element.style.opacity = Math.min(Math.abs(dotProduct) * 2, 1);
+        } else {
+            this.cssObject.element.style.display = 'none';
+            this.cssObject.element.style.opacity = 0;
+        }
     }
 
     animate() {
         requestAnimationFrame(() => this.animate());
 
         this.controls.update();
-
-        // Hide CSS3D website when camera is behind the laptop screen
-        if (this.screenMesh && this.cssObject) {
-            const screenNormal = new THREE.Vector3(0, 0, 1);
-            screenNormal.applyQuaternion(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
-            const cameraDirection = new THREE.Vector3().subVectors(this.camera.position, this.screenMesh.getWorldPosition(new THREE.Vector3()));
-            const dot = screenNormal.dot(cameraDirection.normalize());
-
-            // Hide CSS3DObject when camera is behind or at an angle facing away from the screen
-            this.cssObject.element.style.display = dot > 0.25 ? 'block' : 'none';
-        }
+        this.updateWebsiteVisibility();
 
         this.webglRenderer.render(this.webglScene, this.camera);
         this.css3dRenderer.render(this.css3dScene, this.camera);
