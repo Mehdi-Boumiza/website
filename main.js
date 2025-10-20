@@ -89,6 +89,7 @@ class InteractiveLaptopPortfolio {
                 this.webglScene.add(this.laptopModel);
                 this.findScreenMesh();
                 this.createAndPositionWebsite();
+                this.addBackPlane();
                 this.adjustCameraAndControls();
 
                 this.loadingElement.style.display = 'none';
@@ -99,6 +100,27 @@ class InteractiveLaptopPortfolio {
                 this.loadingElement.innerHTML = `<div class="error">Failed to load</div>`;
             }
         );
+    }
+
+    addBackPlane() {
+        if (!this.screenMesh) return;
+
+        const box = new THREE.Box3().setFromObject(this.screenMesh);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+
+        const geometry = new THREE.PlaneGeometry(size.x, size.y);
+        const material = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.FrontSide });
+        const backPlane = new THREE.Mesh(geometry, material);
+
+        const screenNormal = new THREE.Vector3(0, 0, 1);
+        screenNormal.applyQuaternion(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
+        screenNormal.normalize();
+
+        backPlane.position.copy(center).add(screenNormal.multiplyScalar(-0.03));
+        backPlane.quaternion.copy(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
+
+        this.webglScene.add(backPlane);
     }
 
     scaleAndCenterModel() {
@@ -180,7 +202,6 @@ class InteractiveLaptopPortfolio {
 
         this.css3dScene.add(this.cssObject);
 
-        // Make the actual screen mesh invisible but keep it for collision/depth
         if (this.screenMesh.material) {
             this.screenMesh.material.opacity = 0;
             this.screenMesh.material.transparent = true;
@@ -204,7 +225,7 @@ class InteractiveLaptopPortfolio {
         screenNormal.applyQuaternion(this.screenMesh.getWorldQuaternion(new THREE.Quaternion()));
         screenNormal.normalize();
 
-        const cameraPosition = center.clone().add(screenNormal.multiplyScalar(distance * 1.2));
+        const cameraPosition = center.clone().add(screenNormal.multiplyScalar(-distance * 1.2));
         this.camera.position.copy(cameraPosition);
         this.camera.lookAt(center);
 
@@ -237,8 +258,6 @@ class InteractiveLaptopPortfolio {
 
         const dotProduct = screenNormal.dot(cameraDirection);
 
-        // Show website only when viewing from the front (dot < -0.1 for this model)
-        // Add smooth opacity transition
         if (dotProduct < -0.1) {
             this.cssObject.element.style.display = 'block';
             this.cssObject.element.style.opacity = Math.min(Math.abs(dotProduct) * 2, 1);
@@ -264,7 +283,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (typeof THREE !== 'undefined' && THREE.OrbitControls && THREE.GLTFLoader && THREE.CSS3DRenderer) {
             new InteractiveLaptopPortfolio();
         } else {
-            console.error('Three.js dependencies not loaded:', {
+            console.error('dependecies not loaded:', {
                 THREE: typeof THREE !== 'undefined',
                 OrbitControls: !!(THREE && THREE.OrbitControls),
                 GLTFLoader: !!(THREE && THREE.GLTFLoader),
@@ -272,7 +291,7 @@ window.addEventListener('DOMContentLoaded', () => {
             });
             const loading = document.getElementById('loading');
             if (loading) {
-                loading.innerHTML = '<div class="error">Failed to load Three.js libraries. Please refresh the page.</div>';
+                loading.innerHTML = '<div class="error">failed.</div>';
             }
         }
     }, 500);

@@ -8,13 +8,11 @@
 </head>
 <body>
     <div id="container">
-        <!-- Loading Screen -->
         <div class="loading" id="loading">
             <div class="loading-spinner"></div>
             <div>Loading 3D Portfolio...</div>
         </div>
 
-        <!-- Controls Info -->
         <div class="controls-info">
             <h3>3D Controls</h3>
             <div> Left Click + Drag: Rotate</div>
@@ -23,7 +21,6 @@
             <div> Laptop screen is fully interactive</div>
         </div>
 
-        <!-- Website Content (This will be rendered inside the laptop screen) -->
         <div id="laptop-website">
             <nav class="website-nav">
                 <div class="nav-brand">Portfolio</div>
@@ -46,7 +43,6 @@
                 </div>
             </nav>
 
-            <!-- HOME SECTION -->
             <div id="home" class="content-section active">
                 <div class="hero-section">
                     <div class="hero-content">
@@ -78,7 +74,6 @@
                 </div>
             </div>
 
-            <!-- PROJECTS SECTION -->
             <div id="projects" class="content-section">
                 <div class="section-header">
                     <h2>Featured Projects</h2>
@@ -90,9 +85,10 @@
                             <div class="project-tags">
                                 <span class="tag">JavaScript</span>
                                 <span class="tag">HTML</span>
+                                <span class="tag">Flutter</span>
                             </div>
                             <h3>MarketPlace for Students</h3>
-                            <p>A website built using HTML and JavaScript for students to trade, buy or sell their student materials that they don't use anymore.</p>
+                            <p>A website built using HTML, JavaScript and API keys for students to trade, buy or sell their student materials that they don't use anymore.</p>
                             <a href="#" class="project-link">View on GitHub →</a>
                         </div>
                     </div>
@@ -102,23 +98,23 @@
                             <div class="project-tags">
                                 <span class="tag">AI/ML</span>
                                 <span class="tag">Python</span>
-                                <span class="tag">FastAPI</span>
+                                <span class="tag">Mediapipe</span>
                             </div>
-                            <h3>AI Student Assistant/ Teacher</h3>
-                            <p>Smart AI model designed to help students that face some hardship in their learning journey.</p>
-                            <a href="https://github.com/Mehdi-Boumiza/AI-student-assistant" class="project-link">View on GitHub →</a>
+                            <h3>AI trained for hand gesture recognition</h3>
+                            <p>AI model trained with public datasets online to detect live hand gestures and classify them depending on the gesture.</p>
+                            <a href="https://github.com/Mehdi-Boumiza/hand-gesture" class="project-link">View on GitHub →</a>
                         </div>
                     </div>
 
                     <div class="project-card">
                         <div class="project-content">
                             <div class="project-tags">
-                                <span class="tag">Pytorch</span>
+                                <span class="tag">Tensorflow</span>
                                 <span class="tag">Python</span>
                                 <span class="tag">Numpy/Pandas</span>
                             </div>
                             <h3>AI Cold Caller</h3>
-                            <p>An AI model built to cold call leads for a real estate agency and classify them depending on their interest while keeping everything tracked in an organized spreadsheet.</p>
+                            <p>An AI model built with voices available online using secret api keys to cold call leads for a real estate agency and classify them depending on their interest while keeping everything tracked in an organized spreadsheet.</p>
                             <a href="#" class="project-link">View on GitHub →</a>
                         </div>
                     </div>
@@ -130,15 +126,14 @@
                                 <span class="tag">Python</span>
                                 <span class="tag">TensorFlow</span>
                             </div>
-                            <h3>Cover Letter Web App</h3>
-                            <p>An Amazing Web App designed to help student build and develop their cover letters Professionally in a click of a button.</p>
-                            <a href="https://github.com/Mehdi-Boumiza/Cover-Letter" class="project-link">View on GitHub →</a>
+                            <h3>AI chatbot transformer</h3>
+                            <p>Similair transformer structure to chatgpt's trained with datasets and raw texts available online that generates coherent text.</p>
+                            <a href="https://github.com/Mehdi-Boumiza/chatbot-transformer" class="project-link">View on GitHub →</a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- SKILLS SECTION -->
             <div id="skills" class="content-section">
                 <div class="section-header">
                     <h2>Skills & Technologies</h2>
@@ -226,7 +221,6 @@
                 </div>
             </div>
 
-            <!-- ABOUT SECTION -->
             <div id="about" class="content-section">
                 <div class="section-header">
                     <h2>About Me</h2>
@@ -258,14 +252,14 @@
                                     <div class="interest-icon">🤖</div>
                                     <div class="interest-text">
                                         <h4>Artificial Intelligence</h4>
-                                        <p>Exploring the potential of AI in web applications</p>
+                                        <p>Exploring the potential of AI in many majors</p>
                                     </div>
                                 </div>
                                 <div class="interest-item">
                                     <div class="interest-icon">🎯</div>
                                     <div class="interest-text">
                                         <h4>3D Web Experiences</h4>
-                                        <p>Creating immersive and interactive 3D interfaces</p>
+                                        <p>Creating cool 3D websites.</p>
                                     </div>
                                 </div>
                                 <div class="interest-item">
@@ -288,7 +282,6 @@
                 </div>
             </div>
 
-            <!-- CONTACT SECTION -->
             <div id="contact" class="content-section">
                 <div class="section-header">
                     <h2>Get In Touch</h2>
@@ -346,12 +339,10 @@
         </div>
     </div>
 
-    <!-- Three.js with OrbitControls, GLTFLoader, and CSS3DRenderer -->
     <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/renderers/CSS3DRenderer.js"></script>
-    <!-- Main JavaScript -->
     <script src="main.js"></script>
 
     <script>
