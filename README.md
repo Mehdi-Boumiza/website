@@ -4,9 +4,9 @@ An interactive 3D portfolio website built inside a virtual laptop using Three.js
 Visitors can explore my projects in a 3D environment that blends design and technology.
 
 Features
-	•	Interactive 3D laptop built with Three.js
-	•	Real website content rendered on the laptop screen
-	•	Smooth camera movement and zoom controls
+		Interactive 3D laptop built with Three.js
+		Real website content rendered on the laptop screen
+		Smooth camera movement and zoom controls
 
 Inspiration
 
